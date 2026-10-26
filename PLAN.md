@@ -92,10 +92,10 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 
 ### Tarea 01.1 — Receta estática
 
-- [ ] **RED:** en `tests/test_recipes.py`, probar ejemplo de SPEC.md §4, clave y parámetro extra, clave duplicada, versión mayor 2, menor futura, operación desconocida y referencia inexistente. Ejecutar `pytest tests/test_recipes.py -v`; guardar cada fallo esperado.
-- [ ] **GREEN:** implementar `load_recipe` con las diez claves obligatorias, allowlist y validación de tipos y referencias antes de abrir datos; repetir comando y registrar `PASS`.
-- [ ] **REFACTOR:** separar validación de forma, versión y operaciones; repetir la suite sin cambiar códigos de error.
-- [ ] **Aceptación:** ninguna operación desconocida se omite o ejecuta; los errores indican código y ubicación JSON, sin valores de celdas.
+- [x] **RED:** en `tests/test_recipes.py`, probar ejemplo de SPEC.md §4, clave y parámetro extra, clave duplicada, versión mayor 2, menor futura, operación desconocida y referencia inexistente. Ejecutar `pytest tests/test_recipes.py -v`; guardar cada fallo esperado.
+- [x] **GREEN:** implementar `load_recipe` con las diez claves obligatorias, allowlist y validación de tipos y referencias antes de abrir datos; repetir comando y registrar `PASS`.
+- [x] **REFACTOR:** separar validación de forma, versión y operaciones; repetir la suite sin cambiar códigos de error.
+- [x] **Aceptación:** ninguna operación desconocida se omite o ejecuta; los errores indican código y ubicación JSON, sin valores de celdas.
 
 ### Tarea 01.2 — Espacio y rutas
 
