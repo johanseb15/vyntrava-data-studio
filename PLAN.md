@@ -99,10 +99,10 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 
 ### Tarea 01.2 — Espacio y rutas
 
-- [ ] **RED:** en `tests/test_workspace.py`, probar nombre base válido y rechazo de `..`, ruta absoluta, UNC, unidad, separador, symlink/junction, acceso desde cliente A al B y salida hacia `originales/`. Ejecutar `pytest tests/test_workspace.py -v`; guardar fallos.
-- [ ] **GREEN:** implementar `resolve_input` y `resolve_output`; comprobar identificadores, componentes existentes, ruta canónica y destino permitido antes de usar. Repetir pruebas y registrar `PASS`.
-- [ ] **REFACTOR:** centralizar comprobación de componentes; repetir suite y documentar el límite ante reemplazo concurrente de rutas.
-- [ ] **Aceptación:** el original nunca se abre para escritura y un cruce de encargo se rechaza antes de leer o crear archivos.
+- [x] **RED:** en `tests/test_workspace.py`, probar nombre base válido y rechazo de `..`, ruta absoluta, UNC, unidad, separador, symlink/junction, acceso desde cliente A al B y salida hacia `originales/`. Ejecutar `pytest tests/test_workspace.py -v`; guardar fallos. Evidencia: `reports/ADEL-S01-002.md`.
+- [x] **GREEN:** implementar `resolve_input` y `resolve_output`; comprobar identificadores, componentes existentes, ruta canónica y destino permitido antes de usar. Repetir pruebas y registrar `PASS`.
+- [x] **REFACTOR:** centralizar comprobación de componentes; repetir suite y documentar el límite ante reemplazo concurrente de rutas.
+- [ ] **Aceptación:** el original nunca se abre para escritura y un cruce de encargo se rechaza antes de leer o crear archivos. La creación de symlinks no está disponible en este entorno; las pruebas de junctions sí se ejecutaron.
 
 ### Tarea 01.3 — CSV estricto
 
