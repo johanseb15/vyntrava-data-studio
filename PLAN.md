@@ -106,11 +106,11 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 
 ### Tarea 01.3 — CSV estricto
 
-- [ ] **RED:** en `tests/test_importer.py`, probar coma, punto y coma, BOM correcto e incompatible, UTF-8 inválido, delimitador ausente, 10.485.760 y 10.485.761 bytes, cero bytes, solo BOM y encabezado sin filas. Ejecutar `pytest tests/test_importer.py -v`; guardar fallos.
-- [ ] **RED:** añadir campos entrecomillados con delimitador, `""`, salto LF interior, CRLF, CR aislado, comillas sin cerrar, encabezado vacío o duplicado, ancho desigual y línea vacía intermedia. Guardar fallos antes de completar la implementación.
-- [ ] **GREEN:** implementar `read_csv` según SPEC.md §5, sin autodetección ni sustitución de caracteres; repetir suite y registrar `PASS`.
-- [ ] **REFACTOR:** separar límite/decodificación de análisis CSV; repetir suite.
-- [ ] **Aceptación:** preservar texto, encabezados y orden; un fallo no devuelve tabla parcial ni vuelca datos de celda en el error.
+- [x] **RED:** en `tests/test_importer.py`, probar coma, punto y coma, BOM correcto e incompatible, UTF-8 inválido, delimitador ausente, 10.485.760 y 10.485.761 bytes, cero bytes, solo BOM y encabezado sin filas. Evidencia: `reports/ADEL-S01-003.md`.
+- [x] **RED:** añadir campos entrecomillados con delimitador, `""`, salto LF interior, CRLF, CR aislado, comillas sin cerrar, encabezado vacío o duplicado, ancho desigual y línea vacía intermedia.
+- [x] **GREEN:** implementar `read_csv` según SPEC.md §5, sin autodetección ni sustitución de caracteres.
+- [x] **REFACTOR:** separar límite/decodificación de análisis CSV; repetir suite.
+- [x] **Aceptación:** preservar texto, encabezados y orden; un fallo no devuelve tabla parcial ni vuelca datos de celda en el error.
 
 ### Tarea 01.4 — Diagnóstico
 
