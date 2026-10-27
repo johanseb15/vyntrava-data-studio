@@ -114,10 +114,10 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 
 ### Tarea 01.4 — Diagnóstico
 
-- [ ] **RED:** en `tests/test_diagnostics.py`, usar Piloto A de SPEC.md §8 y afirmar 6 filas, 4 columnas, 1 duplicado, 3 vacíos literales, 1 celda solo espacios; probar también columna sin datos e inferencia `entero`, `decimal`, `texto`. Ejecutar `pytest tests/test_diagnostics.py -v`; guardar fallos.
-- [ ] **GREEN:** implementar `diagnose` sin mutar `CsvTable`; repetir suite y registrar `PASS`.
-- [ ] **REFACTOR:** separar conteos e inferencia; repetir suite.
-- [ ] **Aceptación:** dos ejecuciones producen el mismo resumen y este no contiene valores de celda.
+- [x] **RED:** en `tests/test_diagnostics.py`, usar Piloto A de SPEC.md §8 y afirmar 6 filas, 4 columnas, 1 duplicado, 3 vacíos literales, 1 celda solo espacios; probar también columna sin datos e inferencia `entero`, `decimal`, `texto`. Ejecutar `pytest tests/test_diagnostics.py -v`; guardar fallos. Evidencia: `reports/ADEL-S01-004.md`.
+- [x] **GREEN:** implementar `diagnose` sin mutar `CsvTable`; repetir suite y registrar `PASS`.
+- [x] **REFACTOR:** separar conteos e inferencia; repetir suite.
+- [x] **Aceptación:** dos ejecuciones producen el mismo resumen y este no contiene valores de celda.
 
 ### Tarea 01.5 — Corte vertical
 
