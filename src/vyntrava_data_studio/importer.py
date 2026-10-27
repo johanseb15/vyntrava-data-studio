@@ -17,6 +17,7 @@ _MESSAGES = {
     "invalid_encoding_name": "CSV encoding must be utf-8 or utf-8-sig",
     "invalid_delimiter": "CSV delimiter must be comma or semicolon",
     "delimiter_mismatch": "CSV appears to use a different delimiter",
+    "delimiter_ambiguous": "CSV has another plausible delimiter; confirm the selected delimiter",
     "missing_header": "CSV header is missing",
     "invalid_header": "CSV header contains an empty or repeated column",
     "unequal_width": "CSV record has a different number of fields",
@@ -138,7 +139,7 @@ def _parse_records(text: str, delimiter: str) -> tuple[tuple[str, ...], ...]:
     return tuple(records)
 
 
-def read_csv(path: Path, encoding: str, delimiter: str) -> CsvTable:
+def read_csv(path: Path, encoding: str, delimiter: str, *, ambiguity_confirmed: bool = False) -> CsvTable:
     """Read a strict CSV without changing any cell or column text."""
     if encoding not in ("utf-8", "utf-8-sig"):
         raise CsvError("invalid_encoding_name")
@@ -151,17 +152,18 @@ def read_csv(path: Path, encoding: str, delimiter: str) -> CsvTable:
     text, has_bom = _read_text(source, encoding)
     records = _parse_records(text, delimiter)
     headers = records[0]
-    if len(headers) == 1:
-        other = ";" if delimiter == "," else ","
-        try:
-            alternative = _parse_records(text, other)
-        except CsvError:
-            alternative = ()
-        if alternative and len(alternative[0]) > 1 and all(len(row) == len(alternative[0]) for row in alternative):
-            raise CsvError("delimiter_mismatch", 1)
+    other = ";" if delimiter == "," else ","
+    try:
+        alternative = _parse_records(text, other)
+    except CsvError:
+        alternative = ()
     if any(not header for header in headers) or len(set(headers)) != len(headers):
         raise CsvError("invalid_header", 1)
     for number, row in enumerate(records[1:], 2):
         if len(row) != len(headers):
             raise CsvError("unequal_width", number)
+    if (not ambiguity_confirmed and alternative and len(alternative[0]) > 1
+            and all(len(row) == len(alternative[0]) for row in alternative)
+            and all(alternative[0]) and len(set(alternative[0])) == len(alternative[0])):
+        raise CsvError("delimiter_mismatch" if len(headers) == 1 else "delimiter_ambiguous", 1)
     return CsvTable(headers, records[1:], has_bom, delimiter, encoding)

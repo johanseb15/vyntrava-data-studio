@@ -95,6 +95,32 @@ def test_wrong_delimiter_is_not_silently_used(tmp_path):
     rejected(tmp_path, b"a;b\n1;2\n", "delimiter_mismatch", delimiter=",")
 
 
+@pytest.mark.parametrize("delimiter,content", [
+    (",", b"a,b;c,d\n1,2;3,4\n5,6;7,8\n"),
+    (";", b"a;b,c;d\n1;2,3;4\n5;6,7;8\n"),
+])
+def test_ambiguous_delimiter_requires_explicit_confirmation(tmp_path, delimiter, content):
+    rejected(tmp_path, content, "delimiter_ambiguous", delimiter=delimiter)
+    source = tmp_path / "sample.csv"
+    table = read_csv(source, "utf-8", delimiter, ambiguity_confirmed=True)
+    expected_middle = ";" if delimiter == "," else ","
+    assert table.headers == ("a", f"b{expected_middle}c", "d")
+    assert table.rows == (("1", f"2{expected_middle}3", "4"),
+                          ("5", f"6{expected_middle}7", "8"))
+
+
+@pytest.mark.parametrize("delimiter,content,headers,rows", [
+    (",", b'a,b\n"one;two",three\n"four;five",six\n',
+     ("a", "b"), (("one;two", "three"), ("four;five", "six"))),
+    (";", b'a;b\n"one,two";three\n"four,five";six\n',
+     ("a", "b"), (("one,two", "three"), ("four,five", "six"))),
+])
+def test_accepts_other_delimiter_inside_quoted_fields(tmp_path, delimiter, content, headers, rows):
+    table = load(tmp_path, content, delimiter=delimiter)
+    assert table.headers == headers
+    assert table.rows == rows
+
+
 def test_rejects_non_csv_or_nonregular_input(tmp_path):
     other = tmp_path / "data.txt"
     other.write_bytes(b"a\n")
