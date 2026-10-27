@@ -1,4 +1,5 @@
 import json
+import traceback
 
 import pytest
 
@@ -63,6 +64,18 @@ def test_rejects_duplicate_json_key(tmp_path):
     with pytest.raises(RecipeError) as exc:
         load_recipe(path)
     assert (exc.value.code, exc.value.location) == ("duplicate_key", "$.id")
+
+
+def test_missing_recipe_error_trace_does_not_reveal_path(tmp_path):
+    private_path = tmp_path / "private-client-recipe.json"
+    try:
+        load_recipe(private_path)
+    except RecipeError as exc:
+        rendered = "".join(traceback.format_exception(exc))
+        assert exc.code == "read_error"
+        assert "private-client-recipe.json" not in rendered
+    else:
+        pytest.fail("missing recipe was accepted")
 
 
 def test_rejects_non_json_number(tmp_path, recipe):

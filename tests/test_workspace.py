@@ -1,4 +1,5 @@
 from pathlib import Path
+import traceback
 
 import pytest
 
@@ -92,6 +93,27 @@ def test_rejects_missing_input_and_missing_workspace(spaces):
     with pytest.raises(WorkspaceError) as exc:
         resolve_output(spaces, "cliente_a", "missing", "out.json", "salidas")
     assert exc.value.code == "missing_workspace"
+
+
+def test_inaccessible_input_error_trace_does_not_reveal_path(spaces, monkeypatch):
+    private_name = "private-client-data.csv"
+    target = spaces / "cliente_a" / "encargo_a" / "originales" / private_name
+    original_lstat = Path.lstat
+
+    def inaccessible_lstat(path, *args, **kwargs):
+        if path == target:
+            raise PermissionError(13, "access denied", str(target))
+        return original_lstat(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "lstat", inaccessible_lstat)
+    try:
+        resolve_input(spaces, "cliente_a", "encargo_a", private_name)
+    except WorkspaceError as exc:
+        rendered = "".join(traceback.format_exception(exc))
+        assert exc.code == "inaccessible_path"
+        assert private_name not in rendered
+    else:
+        pytest.fail("inaccessible input was accepted")
 
 
 def test_rejects_redirected_ancestor_of_root(tmp_path, spaces):

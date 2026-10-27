@@ -102,7 +102,7 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 - [x] **RED:** en `tests/test_workspace.py`, probar nombre base válido y rechazo de `..`, ruta absoluta, UNC, unidad, separador, symlink/junction, acceso desde cliente A al B y salida hacia `originales/`. Ejecutar `pytest tests/test_workspace.py -v`; guardar fallos. Evidencia: `reports/ADEL-S01-002.md`.
 - [x] **GREEN:** implementar `resolve_input` y `resolve_output`; comprobar identificadores, componentes existentes, ruta canónica y destino permitido antes de usar. Repetir pruebas y registrar `PASS`.
 - [x] **REFACTOR:** centralizar comprobación de componentes; repetir suite y documentar el límite ante reemplazo concurrente de rutas.
-- [ ] **Aceptación:** el original nunca se abre para escritura y un cruce de encargo se rechaza antes de leer o crear archivos. La creación de symlinks no está disponible en este entorno; las pruebas de junctions sí se ejecutaron.
+- [x] **Aceptación:** el original nunca se abre para escritura y un cruce de encargo se rechaza antes de leer o crear archivos. Evidencia de cierre: `reports/ADEL-S01-005-FIX01.md`. La creación de symlinks no está disponible en este entorno; las pruebas de junctions sí se ejecutaron.
 
 ### Tarea 01.3 — CSV estricto
 
@@ -121,15 +121,17 @@ Este plan implementa SPEC.md §§4–6 y el primer corte de §9. Solo se emplean
 
 ### Tarea 01.5 — Corte vertical
 
-- [ ] **RED:** en `tests/test_vertical_slice.py`, ejecutar Piloto A; afirmar resumen, hash SHA-256 del original antes/después igual y bytes idénticos. Probar ruta cruzada y CSV fallido sin entrega marcada válida. Ejecutar `pytest tests/test_vertical_slice.py -v`; guardar fallos.
-- [ ] **GREEN:** implementar `run_diagnostic` usando 01.1–01.4; resumen en `salidas/` y metadatos sin celdas en `evidencia/`; repetir suite.
-- [ ] **REFACTOR:** aislar composición y serialización del resumen; repetir suite.
-- [ ] **Aceptación:** original inalterado, resumen reproducible, rutas restringidas y sin paquete válido parcial. Limpieza, análisis y entregables comerciales quedan para Sprints 02–04.
+- [x] **RED:** en `tests/test_vertical_slice.py`, ejecutar Piloto A; afirmar resumen, hash SHA-256 del original antes/después igual y bytes idénticos. Probar ruta cruzada y CSV fallido sin entrega marcada válida. Evidencia: `reports/ADEL-S01-005.md`.
+- [x] **GREEN:** implementar `run_diagnostic` usando 01.1–01.4; resumen en `salidas/` y metadatos sin celdas en `evidencia/`; repetir suite.
+- [x] **REFACTOR:** aislar composición y serialización del resumen; repetir suite.
+- [x] **Aceptación:** original inalterado, resumen reproducible, rutas restringidas y sin paquete válido parcial. Limpieza, análisis y entregables comerciales quedan para Sprints 02–04.
 
 ### Tarea 01.6 — Cierre ADEL independiente
 
+**Estado de validaciones FIX01/FIX02:** `reports/ADEL-S01-005-FIX01.md` documenta la revisión técnica; `reports/ADEL-S01-005-FIX02.md` documenta la suite en un entorno nuevo con dependencias instaladas desde `uv.lock`. Falta que el revisor independiente ejecute y confirme el cierre; aún no se acredita el 20% del sprint.
+
 - [ ] Una persona o agente distinto del implementador recibe SPEC.md, hashes de fixtures, comandos y salidas RED/GREEN/REFACTOR; ejecuta las suites de Sprint 01 desde un entorno limpio autorizado.
-- [ ] Recalcula el oráculo del Piloto A a mano; revisa rechazo de ruta cruzada, original intacto y ausencia de filas o nombres sensibles en errores y evidencia. Registra hallazgos con severidad, responsable y estado.
+- [x] Recalcula el oráculo del Piloto A a mano; revisa rechazo de ruta cruzada, original intacto y ausencia de filas o nombres sensibles en errores y evidencia. Hallazgos, responsable y estado: `reports/ADEL-S01-005-FIX01.md`.
 - [ ] Se corrigen hallazgos bloqueantes, se repiten las pruebas afectadas y el revisor confirma el cierre. Sin revisión aceptada no se acredita el 20% de Sprint 01.
 
 **Evidencia ADEL por tarea:** requisito, prueba, hash del fixture, comando y salida RED por el comportamiento previsto, comando y salida GREEN, repetición REFACTOR, hashes del original, incidencias, responsable y decisión independiente. Son comandos de implementación futura; ninguno se ejecuta en Sprint 00.

@@ -39,8 +39,8 @@ def _status(path: Path) -> os.stat_result | None:
         info = path.lstat()
     except FileNotFoundError:
         return None
-    except OSError as exc:
-        raise WorkspaceError("inaccessible_path") from exc
+    except OSError:
+        raise WorkspaceError("inaccessible_path") from None
     if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & _REPARSE_POINT:
         raise WorkspaceError("redirected_path")
     return info

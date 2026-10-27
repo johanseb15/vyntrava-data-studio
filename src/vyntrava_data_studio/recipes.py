@@ -261,8 +261,8 @@ def load_recipe(path: Path) -> Recipe:
     """Carga y valida la receta sin abrir entradas ni crear salidas."""
     try:
         raw = Path(path).read_text(encoding="utf-8")
-    except (OSError, UnicodeError) as exc:
-        raise RecipeError("read_error", "$") from exc
+    except (OSError, UnicodeError):
+        raise RecipeError("read_error", "$") from None
     try:
         parsed = json.loads(raw, object_pairs_hook=_Pairs,
                             parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
