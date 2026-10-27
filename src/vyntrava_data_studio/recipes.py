@@ -1,6 +1,7 @@
 """Validación estática del contrato de recetas JSON v1."""
 
 from dataclasses import dataclass
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -46,6 +47,7 @@ class Recipe:
     id: str
     version: str
     data: dict[str, Any]
+    sha256: str
 
 
 class _Pairs(list):
@@ -169,7 +171,7 @@ def _validate_schema(data: dict, input_ids: set[str]) -> dict[str, set[str]]:
     return result
 
 
-def _validate_parameters(data: dict) -> dict:
+def _validate_parameters(data: dict, overrides: dict | None = None) -> dict:
     params = data["parametros"]
     if not isinstance(params, dict):
         raise RecipeError("invalid_type", "$.parametros")
@@ -177,6 +179,15 @@ def _validate_parameters(data: dict) -> dict:
         _identifier(key, f"$.parametros.{key}")
         if not _scalar(value):
             raise RecipeError("invalid_type", f"$.parametros.{key}")
+    if overrides is not None:
+        if not isinstance(overrides, dict):
+            raise RecipeError("invalid_type", "$.parametros")
+        for key, value in overrides.items():
+            if key not in params:
+                raise RecipeError("unknown_reference", f"$.parametros.{key}")
+            if type(value) is not type(params[key]) or not _scalar(value):
+                raise RecipeError("invalid_type", f"$.parametros.{key}")
+            params[key] = value
     return params
 
 
@@ -216,7 +227,8 @@ def _validate_operations(data: dict, schema: dict[str, set[str]], parameters: di
             for key, value in params.items():
                 param_location = f"{location}.params.{key}"
                 if key == "columnas":
-                    _columns(value, param_location, schema[entry_id])
+                    _columns(value, param_location,
+                             None if op == "columnas_requeridas" else schema[entry_id])
                     continue
                 resolved = _resolve_scalar(value, param_location, parameters)
                 if not isinstance(resolved, str) or not resolved:
@@ -257,10 +269,11 @@ def _validate_outputs(data: dict, input_ids: set[str]) -> None:
                 raise RecipeError("unknown_reference", f"{location}.fuente")
 
 
-def load_recipe(path: Path) -> Recipe:
+def load_recipe(path: Path, overrides: dict | None = None) -> Recipe:
     """Carga y valida la receta sin abrir entradas ni crear salidas."""
     try:
-        raw = Path(path).read_text(encoding="utf-8")
+        raw_bytes = Path(path).read_bytes()
+        raw = raw_bytes.decode("utf-8")
     except (OSError, UnicodeError):
         raise RecipeError("read_error", "$") from None
     try:
@@ -276,7 +289,8 @@ def load_recipe(path: Path) -> Recipe:
         raise RecipeError("invalid_type", "$.tipo_encargo")
     inputs = _validate_inputs(data)
     schema = _validate_schema(data, inputs)
-    params = _validate_parameters(data)
+    params = _validate_parameters(data, overrides)
     _validate_operations(data, schema, params)
     _validate_outputs(data, inputs)
-    return Recipe(data["id"], data["version"], data)
+    return Recipe(data["id"], data["version"], data,
+                  hashlib.sha256(raw_bytes).hexdigest())
