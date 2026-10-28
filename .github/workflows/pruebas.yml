@@ -1,0 +1,40 @@
+name: Pruebas automatizadas
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas en Windows con Python 3.12
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.19'
+          enable-cache: true
+
+      - name: Instalar dependencias bloqueadas
+        run: uv sync --frozen
+
+      - name: Ejecutar pruebas
+        shell: pwsh
+        run: |
+          $directorio = Join-Path $env:RUNNER_TEMP ("vyntrava-pruebas-" + [guid]::NewGuid().ToString("N"))
+          uv run --no-sync python -m pytest -q -rs -p no:cacheprovider --basetemp "$directorio"
