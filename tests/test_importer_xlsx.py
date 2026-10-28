@@ -8,6 +8,7 @@ from openpyxl import Workbook, load_workbook
 from vyntrava_data_studio.importer_xlsx import XlsxError, read_xlsx
 from vyntrava_data_studio.recipes import RecipeError, load_recipe
 from vyntrava_data_studio.sprint02 import run_recipe
+from vyntrava_data_studio.package_verifier import verify_recipe_package
 
 
 def workbook(path, rows):
@@ -134,6 +135,7 @@ def test_xlsx_recipe_runs_analysis_and_records_sheet(tmp_path):
     path = tmp_path / "recipe.json"
     path.write_text(json.dumps(recipe), encoding="utf-8")
     result = run_recipe(path, root, "synthetic", "sales")
+    assert verify_recipe_package(path, root, "synthetic", "sales").ok
     report = json.loads(result.outputs["summary"].read_bytes())
     manifest = json.loads(result.manifest_path.read_bytes())
     assert report["analisis"]["total"]["total"] == "27.50"

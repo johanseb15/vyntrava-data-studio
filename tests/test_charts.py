@@ -7,6 +7,7 @@ from PIL import Image
 from vyntrava_data_studio import charts
 from vyntrava_data_studio.charts import grouped_amounts_png
 from vyntrava_data_studio.sprint02 import run_recipe
+from vyntrava_data_studio.package_verifier import verify_recipe_package
 
 
 def test_chart_png_from_grouped_sales(tmp_path):
@@ -79,6 +80,7 @@ def test_chart_png_from_grouped_sales(tmp_path):
     )
 
     result = run_recipe(recipe, root, "synthetic", "sales")
+    assert verify_recipe_package(recipe, root, "synthetic", "sales").ok
 
     assert result.status == "validado"
     assert set(result.outputs) == {"resumen", "grafico"}
