@@ -1,7 +1,7 @@
 [project]
 name = "vyntrava-data-studio"
 version = "0.1.0"
-description = "Add your description here"
+description = "Motor local de procesamiento de datos mediante recetas versionadas y entregas verificables"
 authors = [
     { name = "johanseb15", email = "johanseb15@hotmail.com" }
 ]
