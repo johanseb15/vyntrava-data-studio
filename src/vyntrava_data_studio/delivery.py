@@ -82,11 +82,13 @@ def _delimiters(recipe: Recipe, confirmed: dict[str, str] | None) -> dict[str, s
     if confirmed is not None and not isinstance(confirmed, dict):
         raise DeliveryError("invalid_confirmation")
     confirmed = confirmed or {}
-    entry_ids = {item["id"] for item in recipe.data["entradas"]}
+    entry_ids = {item["id"] for item in recipe.data["entradas"] if item["formato"] == "csv"}
     if confirmed.keys() - entry_ids:
         raise DeliveryError("invalid_confirmation")
     effective = {}
     for entry in recipe.data["entradas"]:
+        if entry["formato"] != "csv":
+            continue
         entry_id = entry["id"]
         declared = entry.get("delimitador")
         selected = confirmed.get(entry_id, declared)

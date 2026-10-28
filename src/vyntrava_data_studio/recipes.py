@@ -131,7 +131,7 @@ def _columns(value: Any, location: str, available: set[str] | None = None) -> li
 def _validate_version(value: Any) -> None:
     if not isinstance(value, str) or not (match := VERSION.fullmatch(value)):
         raise RecipeError("invalid_version", "$.version")
-    if match[1] != "1" or match[2] != "0":
+    if match[1] != "1" or match[2] not in {"0", "1"}:
         raise RecipeError("unsupported_version", "$.version")
 
 
@@ -139,17 +139,28 @@ def _validate_inputs(data: dict) -> set[str]:
     ids = set()
     for index, raw in enumerate(_list(data["entradas"], "$.entradas", nonempty=True)):
         location = f"$.entradas[{index}]"
-        item = _object(raw, location, {"id", "ruta", "formato", "codificacion"}, {"delimitador"})
+        if not isinstance(raw, dict):
+            raise RecipeError("invalid_type", location)
+        fmt = raw.get("formato")
+        _choice(fmt, {"csv", "xlsx"}, f"{location}.formato")
+        if fmt == "xlsx":
+            if data["version"].split(".")[1] != "1":
+                raise RecipeError("unsupported_version", "$.version")
+            item = _object(raw, location, {"id", "ruta", "formato", "hoja"})
+            if not isinstance(item["hoja"], str) or not item["hoja"]:
+                raise RecipeError("invalid_type", f"{location}.hoja")
+        else:
+            item = _object(raw, location, {"id", "ruta", "formato", "codificacion"}, {"delimitador"})
         entry_id = _identifier(item["id"], f"{location}.id")
         if entry_id in ids:
             raise RecipeError("duplicate_id", f"{location}.id")
         ids.add(entry_id)
         path = _basename(item["ruta"], f"{location}.ruta")
-        if not path.endswith(".csv"):
+        if not path.endswith(".xlsx" if fmt == "xlsx" else ".csv"):
             raise RecipeError("invalid_path", f"{location}.ruta")
-        _choice(item["formato"], {"csv"}, f"{location}.formato")
-        _choice(item["codificacion"], {"utf-8", "utf-8-sig"}, f"{location}.codificacion")
-        if "delimitador" in item:
+        if fmt == "csv":
+            _choice(item["codificacion"], {"utf-8", "utf-8-sig"}, f"{location}.codificacion")
+        if fmt == "csv" and "delimitador" in item:
             _choice(item["delimitador"], {",", ";"}, f"{location}.delimitador")
     return ids
 
@@ -263,6 +274,8 @@ def _validate_outputs(data: dict, input_ids: set[str]) -> None:
                                     or item["fuente"] not in input_ids):
             raise RecipeError("unknown_reference", f"{location}.fuente")
         if kind == "grafico_png":
+            if not path.lower().endswith(".png"):
+                raise RecipeError("invalid_path", f"{location}.ruta")
             sources = {entry["id"] for entry in data["analisis"]
                        if entry["op"] == "suma_producto" and "grupo" in entry["params"]}
             if not isinstance(item["fuente"], str) or item["fuente"] not in sources:

@@ -43,12 +43,19 @@ def test_accepts_spec_shape(tmp_path, recipe):
     assert result.data["reglas"][0]["params"]["columnas"] == ["nombre"]
 
 
+def test_chart_requires_png_filename(tmp_path, recipe):
+    recipe["analisis"] = [{"id": "por_id", "op": "suma_producto", "entrada": "clientes",
+                           "params": {"cantidad": "id", "precio": "id", "grupo": "nombre"}}]
+    recipe["salidas"].append({"id": "chart", "tipo": "grafico_png",
+                              "ruta": "chart.csv", "fuente": "por_id"})
+    rejects(tmp_path, recipe, "invalid_path", "$.salidas[1].ruta")
+
+
 @pytest.mark.parametrize("change,code,location", [
     (lambda r: r.update(extra=True), "unknown_field", "$.extra"),
     (lambda r: r.pop("salidas"), "missing_field", "$.salidas"),
     (lambda r: r["reglas"][0]["params"].update(extra=1), "unknown_field", "$.reglas[0].params.extra"),
     (lambda r: r.update(version="2.0.0"), "unsupported_version", "$.version"),
-    (lambda r: r.update(version="1.1.0"), "unsupported_version", "$.version"),
     (lambda r: r["reglas"][0].update(op="ejecutar_python"), "unknown_operation", "$.reglas[0].op"),
     (lambda r: r["reglas"][0].update(entrada="otro"), "unknown_reference", "$.reglas[0].entrada"),
     (lambda r: r["reglas"][0]["params"].update(columnas=["fantasma"]), "unknown_reference", "$.reglas[0].params.columnas[0]"),
