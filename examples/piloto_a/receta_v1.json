@@ -1,0 +1,20 @@
+{
+  "id": "piloto_clientes", "version": "1.0.0", "tipo_encargo": "limpieza_clientes",
+  "entradas": [{"id": "clientes", "ruta": "clientes.csv", "formato": "csv", "codificacion": "utf-8", "delimitador": ","}],
+  "esquema": {"clientes": {"columnas": ["id", "nombre", "email", "ciudad"], "extras": "rechazar"}},
+  "parametros": {},
+  "reglas": [
+    {"id": "diagnostico", "op": "diagnosticar", "entrada": "clientes", "params": {}},
+    {"id": "deduplicar", "op": "eliminar_duplicados_exactos", "entrada": "clientes", "params": {"aprobacion": "aprobacion_a"}},
+    {"id": "recortar", "op": "recortar_espacios", "entrada": "clientes", "params": {"columnas": ["nombre", "ciudad"]}}
+  ],
+  "validaciones": [
+    {"id": "ausencias", "op": "no_vacio", "entrada": "clientes", "params": {"columnas": ["nombre", "email", "ciudad"]}, "severidad": "advertir"},
+    {"id": "email", "op": "email_simple", "entrada": "clientes", "params": {"columna": "email"}, "severidad": "advertir"}
+  ],
+  "analisis": [],
+  "salidas": [
+    {"id": "resumen", "tipo": "resumen_json", "ruta": "resumen.json"},
+    {"id": "tabla", "tipo": "tabla_csv", "ruta": "clientes_limpios.csv", "fuente": "clientes"}
+  ]
+}

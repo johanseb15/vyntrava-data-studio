@@ -1,0 +1,7 @@
+id,nombre,email,ciudad
+C001,Ana Ruiz,ana@example.test,Buenos Aires
+C002,Luis Paz,,Córdoba
+C002,Luis Paz,,Córdoba
+C003,  Mara Sol  ,mara@example.test,   
+C004,Jo Vale,no-es-email,Rosario
+C005,,eve@example.test,Mendoza

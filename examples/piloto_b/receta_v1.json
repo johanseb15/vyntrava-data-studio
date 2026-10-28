@@ -1,0 +1,17 @@
+{
+  "id": "piloto_ventas", "version": "1.0.0", "tipo_encargo": "analisis_ventas",
+  "entradas": [{"id": "ventas", "ruta": "ventas.csv", "formato": "csv", "codificacion": "utf-8-sig", "delimitador": ";"}],
+  "esquema": {"ventas": {"columnas": ["id", "fecha", "producto", "cantidad", "precio"], "extras": "rechazar"}},
+  "parametros": {},
+  "reglas": [{"id": "deduplicar", "op": "eliminar_duplicados_exactos", "entrada": "ventas", "params": {"aprobacion": "aprobacion_b"}}],
+  "validaciones": [{"id": "cantidad_valida", "op": "entero_positivo", "entrada": "ventas", "params": {"columna": "cantidad"}, "severidad": "advertir"}],
+  "analisis": [
+    {"id": "ventas_fecha", "op": "suma_producto", "entrada": "ventas", "params": {"cantidad": "cantidad", "precio": "precio", "grupo": "fecha"}},
+    {"id": "ventas_producto", "op": "suma_producto", "entrada": "ventas", "params": {"cantidad": "cantidad", "precio": "precio", "grupo": "producto"}}
+  ],
+  "salidas": [
+    {"id": "resumen", "tipo": "resumen_json", "ruta": "resumen.json"},
+    {"id": "tabla", "tipo": "tabla_csv", "ruta": "ventas_limpias.csv", "fuente": "ventas"},
+    {"id": "grafico", "tipo": "grafico_png", "ruta": "ventas_fecha.png", "fuente": "ventas_fecha"}
+  ]
+}
