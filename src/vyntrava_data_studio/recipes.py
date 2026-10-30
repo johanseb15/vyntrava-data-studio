@@ -18,6 +18,7 @@ OPERATIONS = {
         "diagnosticar": (frozenset(), frozenset()),
         "recortar_espacios": (frozenset({"columnas"}), frozenset()),
         "eliminar_duplicados_exactos": (frozenset({"aprobacion"}), frozenset()),
+        "unir_filas": (frozenset({"otra_entrada"}), frozenset()),
     },
     "validaciones": {
         "columnas_requeridas": (frozenset({"columnas"}), frozenset()),
@@ -213,6 +214,7 @@ def _resolve_scalar(value: Any, location: str, parameters: dict) -> Any:
 
 
 def _validate_operations(data: dict, schema: dict[str, set[str]], parameters: dict) -> None:
+    inputs = {entry["id"]: entry for entry in data["entradas"]}
     for section, operations in OPERATIONS.items():
         seen = set()
         for index, raw in enumerate(_list(data[section], f"$.{section}")):
@@ -244,6 +246,14 @@ def _validate_operations(data: dict, schema: dict[str, set[str]], parameters: di
                 resolved = _resolve_scalar(value, param_location, parameters)
                 if not isinstance(resolved, str) or not resolved:
                     raise RecipeError("invalid_type", param_location)
+                if key == "otra_entrada":
+                    if resolved not in inputs:
+                        raise RecipeError("unknown_reference", param_location)
+                    if (resolved == entry_id or inputs[entry_id]["formato"] != "xlsx"
+                            or inputs[resolved]["formato"] != "xlsx"):
+                        raise RecipeError("invalid_value", param_location)
+                    params[key] = resolved
+                    continue
                 if key != "aprobacion" and resolved not in schema[entry_id]:
                     raise RecipeError("unknown_reference", param_location)
                 if key == "aprobacion":
