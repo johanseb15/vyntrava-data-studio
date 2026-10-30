@@ -231,7 +231,14 @@ def run_recipe(recipe_path: Path, root: Path, client: str, job: str,
                 recipe_hash, input_hashes, approval_key):
             raise DeliveryError("approval_required")
         name = rule["entrada"]
-        tables[name], count = _clean(tables[name], rule)
+        if rule["op"] == "unir_filas":
+            other = tables[rule["params"]["otra_entrada"]]
+            if tables[name].headers != other.headers:
+                raise DeliveryError("schema_mismatch")
+            tables[name] = _replace_rows(tables[name], tables[name].rows + other.rows)
+            count = len(other.rows)
+        else:
+            tables[name], count = _clean(tables[name], rule)
         changes[rule["id"]] = {"op": rule["op"], "cambios": count}
     validations = {}
     blocking = False
@@ -251,6 +258,13 @@ def run_recipe(recipe_path: Path, root: Path, client: str, job: str,
               "entradas": {name: {"antes": before[name], "despues": _summary(table, extras[name])}
                            for name, table in tables.items()},
               "reglas": changes, "validaciones": validations}
+    joined = {source for rule in recipe.data["reglas"] if rule["op"] == "unir_filas"
+              for source in (rule["entrada"], rule["params"]["otra_entrada"])}
+    if joined:
+        report["procedencia"] = {
+            entry["id"]: {"sha256": input_hashes[entry["id"]], "formato": "xlsx",
+                          "hoja": entry["hoja"]}
+            for entry in recipe.data["entradas"] if entry["id"] in joined}
     if analyses:
         report["analisis"] = analyses
     contents = {}
