@@ -1,3 +1,26 @@
+# vyntrava-data-studio
+
+> **Ficha de proyecto — Vyntrava | 2026-11-20**
+> Revisión documental del repositorio. Esta ficha no certifica un despliegue ni un estado de producción.
+
+## Para qué sirve
+
+**Motor local de limpieza y análisis reproducible.** Herramienta Python para CSV/XLSX con recetas versionadas, separación por cliente, validaciones, paquetes de entrega y verificaciones por hash.
+
+## Estado y límites
+
+Prototipo técnico: los ejemplos y tests existentes no equivalen a una validación comercial con archivos de clientes. Deducciones ambiguas requieren revisión humana.
+
+## Lugar en el portfolio
+
+Base técnica de los servicios de calidad de datos y Catalog Rescue; no confundirlo con un servicio ya entregado a clientes.
+
+[Consultar repositorio](https://github.com/johanseb15/vyntrava-data-studio)
+
+---
+
+> **README técnico original:** se conserva íntegro a continuación.
+
 <div align="center">
 
 <img src="assets/vyntrava-data-banner.svg" alt="Vyntrava Data Studio: procesamiento local, recetas versionadas e integridad verificable" width="100%" />
